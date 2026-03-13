@@ -6,22 +6,21 @@
 import { AudioQualityLevel } from "./gemini";
 
 const NOISE_FILES: Record<string, string> = {
-  light: "/noise/light-ambient.wav",
-  moderate: "/noise/moderate-office.wav",
+  moderate: "/noise/ambient_noise.mp3",
 };
 
 const NOISE_GAIN: Record<string, number> = {
-  clean: 0,
-  light: 0.08,
-  moderate: 0.18,
+  moderate: 1.0,
 };
+
+const SPEECH_GAIN = 1.0;
 
 export async function mixAudioWithNoise(
   audioUrl: string,
   qualityLevel: AudioQualityLevel
 ): Promise<string> {
-  // No mixing needed for clean audio
-  if (qualityLevel === "clean") {
+  // Only moderate quality should apply ambient mixing.
+  if (qualityLevel !== "moderate") {
     return audioUrl;
   }
 
@@ -50,7 +49,7 @@ export async function mixAudioWithNoise(
     // Mix speech (mono or take first channel)
     const speechData = speechBuffer.getChannelData(0);
     for (let i = 0; i < outputLength; i++) {
-      outputData[i] = speechData[i];
+      outputData[i] = speechData[i] * SPEECH_GAIN;
     }
 
     // Loop and mix noise at the configured gain
@@ -58,6 +57,19 @@ export async function mixAudioWithNoise(
     const noiseGain = NOISE_GAIN[qualityLevel];
     for (let i = 0; i < outputLength; i++) {
       outputData[i] += noiseData[i % noiseData.length] * noiseGain;
+    }
+
+    // Normalize the combined waveform to avoid hard clipping while preserving the loud mix.
+    let peak = 0;
+    for (let i = 0; i < outputLength; i++) {
+      const abs = Math.abs(outputData[i]);
+      if (abs > peak) peak = abs;
+    }
+    if (peak > 1) {
+      const scale = 1 / peak;
+      for (let i = 0; i < outputLength; i++) {
+        outputData[i] *= scale;
+      }
     }
 
     // Clamp values to prevent clipping

@@ -9,7 +9,7 @@ Generate realistic two-speaker call center audio from text transcripts. Uses AI 
 - **Multi-Provider AI** — Generate transcripts with Google Gemini, OpenAI GPT-4o, or Anthropic Claude
 - **Multi-Speaker TTS** — Convert transcripts to audio with distinct voices per speaker (Gemini or OpenAI)
 - **Scenario Presets** — Quick-start templates for QA, sales, compliance, and escalation scenarios
-- **Ambient Noise Mixing** — Layer realistic call center ambience (clean, light, moderate) via client-side Web Audio API
+- **Ambient Noise Mixing** — Layer realistic call center ambience for Moderate Office - Ambient Noise via client-side Web Audio API
 - **Audio History** — Browse, replay, and download the last 10 generated audio files
 - **Session-Only Keys** — API keys live in `sessionStorage` and are cleared when you close the tab
 

@@ -162,10 +162,9 @@ className="bg-btn-primary"      // black button
 | ID | Name | Description |
 |----|------|-------------|
 | `clean` | Clean (Studio Quality) | No ambient noise |
-| `light` | Light Ambient | Subtle office sounds |
-| `moderate` | Moderate Office | Ambient noise with faint conversations |
+| `moderate` | Moderate Office - Ambient Noise | Ambient noise with faint conversations |
 
-Noise files: `public/noise/light-ambient.wav`, `public/noise/moderate-office.wav`
+Noise files: `public/noise/ambient_noise.mp3`
 Mixing done client-side via Web Audio API (`src/lib/audio-mixer.ts`).
 
 ### Transcript Format

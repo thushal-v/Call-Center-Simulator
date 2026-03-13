@@ -22,7 +22,8 @@ export default function AudioQualitySelector({
       >
         {AUDIO_QUALITY_LEVELS.map((level) => (
           <option key={level.id} value={level.id}>
-            {level.name} — {level.description}
+            {level.name}
+            {level.description ? ` — ${level.description}` : ""}
           </option>
         ))}
       </select>

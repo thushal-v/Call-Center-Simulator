@@ -60,14 +60,9 @@ export const AUDIO_QUALITY_LEVELS = [
     description: "No ambient noise",
   },
   {
-    id: "light",
-    name: "Light Ambient",
-    description: "Subtle office sounds",
-  },
-  {
     id: "moderate",
-    name: "Moderate Office",
-    description: "Ambient noise with faint conversations",
+    name: "Moderate Office — Ambient Noise",
+    description: "",
   },
 ] as const;
 

@@ -2,8 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HistoryEntry } from "@/lib/history";
-import { mixAudioWithNoise } from "@/lib/audio-mixer";
-import { AudioQualityLevel } from "@/lib/gemini";
 
 interface AudioHistoryItemProps {
   entry: HistoryEntry;
@@ -29,8 +27,6 @@ export default function AudioHistoryItem({
   const progressRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [mixing, setMixing] = useState(false);
-  const mixedUrlRef = useRef<string | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
@@ -57,14 +53,11 @@ export default function AudioHistoryItem({
     };
   }, [handleTimeUpdate, handleLoadedMetadata]);
 
-  // Clean up audio playback and object URLs on unmount
+  // Clean up audio playback on unmount
   useEffect(() => {
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
-      }
-      if (mixedUrlRef.current && mixedUrlRef.current.startsWith("blob:")) {
-        URL.revokeObjectURL(mixedUrlRef.current);
       }
     };
   }, []);
@@ -75,30 +68,6 @@ export default function AudioHistoryItem({
       audioRef.current.pause();
       setIsPlaying(false);
       return;
-    }
-
-    // Mix noise on first play, then cache the result
-    if (!mixedUrlRef.current) {
-      setMixing(true);
-      try {
-        mixedUrlRef.current = await mixAudioWithNoise(
-          entry.audioUrl,
-          entry.qualityLevel as AudioQualityLevel
-        );
-        audioRef.current.src = mixedUrlRef.current;
-        // Wait for new source to load
-        await new Promise<void>((resolve) => {
-          const onLoaded = () => {
-            audioRef.current?.removeEventListener("loadedmetadata", onLoaded);
-            resolve();
-          };
-          audioRef.current?.addEventListener("loadedmetadata", onLoaded);
-        });
-      } catch {
-        mixedUrlRef.current = entry.audioUrl;
-      } finally {
-        setMixing(false);
-      }
     }
 
     audioRef.current.play();
@@ -145,12 +114,9 @@ export default function AudioHistoryItem({
       <div className="flex items-center gap-3 px-4 py-3">
         <button
           onClick={togglePlay}
-          disabled={mixing}
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-btn-primary text-white transition hover:bg-btn-primary/80 disabled:opacity-50"
         >
-          {mixing ? (
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-          ) : isPlaying ? (
+          {isPlaying ? (
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <rect x="6" y="4" width="4" height="16" />
               <rect x="14" y="4" width="4" height="16" />

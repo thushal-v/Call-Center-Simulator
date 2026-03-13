@@ -3,6 +3,7 @@ import { generateMultiSpeakerAudio } from "@/lib/tts";
 import { generateOpenAIMultiSpeakerAudio, OPENAI_TTS_VOICES } from "@/lib/openai-tts";
 import { addHistoryEntry, saveAudioFile } from "@/lib/history";
 import { GEMINI_VOICES, AUDIO_QUALITY_LEVELS } from "@/lib/gemini";
+import { mixAudioBufferWithAmbientNoise } from "@/lib/audio-mixer-server";
 
 const VALID_GEMINI_VOICES = new Set<string>(GEMINI_VOICES);
 const VALID_OPENAI_VOICES = new Set<string>(OPENAI_TTS_VOICES);
@@ -77,8 +78,10 @@ export async function POST(request: NextRequest) {
       audioBuffer = await generateMultiSpeakerAudio(apiKey, transcript, voice1, voice2);
     }
 
+    const finalAudioBuffer = await mixAudioBufferWithAmbientNoise(audioBuffer, quality);
+
     const id = `audio-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    const audioUrl = await saveAudioFile(id, audioBuffer);
+    const audioUrl = await saveAudioFile(id, finalAudioBuffer);
 
     const entry = {
       id,
