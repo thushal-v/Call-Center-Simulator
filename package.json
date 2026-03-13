@@ -1,5 +1,5 @@
 {
-  "name": "call-center-transcript-generator",
+  "name": "call-center-simulator",
   "version": "0.1.0",
   "private": true,
   "scripts": {
